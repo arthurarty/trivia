@@ -20,13 +20,20 @@ def create_app(test_config=None):
     response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
     return response
 
-  @app.route('/categories', methods=['GET'])
-  def get_categories():
+  def get_all_categories():
+    """
+    Gets all categories form db and formats
+    to return a list of dictionary items
+    """
     categories = Category.query.all()
     category_list = [category.format() for category in categories]
+    return category_list
+
+  @app.route('/categories', methods=['GET'])
+  def get_categories():
     return jsonify({
       'success':True,
-      'categories': category_list,
+      'categories': get_all_categories(),
     })
 
   '''
@@ -41,7 +48,24 @@ def create_app(test_config=None):
   ten questions per page and pagination at the bottom of the screen for three pages.
   Clicking on the page numbers should update the questions. 
   '''
+  @app.route('/questions', methods=['GET'])
+  def get_questions():
+    all_questions = Question.query.all()
+    page = request.args.get('page', 1, type=int)
+    start =  (page - 1) * QUESTIONS_PER_PAGE
+    end = start + QUESTIONS_PER_PAGE
 
+    questions = [question.format() for question in all_questions]
+    current_questions = questions[start:end]
+    category = Category.query.first()
+    current_category = category.format()
+    return jsonify({
+      'success': True,
+      'questions': current_questions,
+      'total_questions': len(questions),
+      'categories': current_category,
+      'current_category': current_category,
+    })
   '''
   @TODO: 
   Create an endpoint to DELETE question using a question ID. 
@@ -49,7 +73,7 @@ def create_app(test_config=None):
   TEST: When you click the trash icon next to a question, the question will be removed.
   This removal will persist in the database and when you refresh the page. 
   '''
-
+  
   '''
   @TODO: 
   Create an endpoint to POST a new question, 
