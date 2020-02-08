@@ -43,10 +43,8 @@ def create_app(test_config=None):
       'current_category': None,
     })
 
-
   @app.route('/questions/<int:question_id>', methods=['DELETE'])
   def delete_question(question_id):
-    
     
     question = Question.query.filter(Question.id == question_id).one_or_none()
 
@@ -64,7 +62,7 @@ def create_app(test_config=None):
         'total_questions': question_resp['total_questions']
       })
     except:
-      abort(402)
+      abort(422)
   '''
   @TODO: 
   Create an endpoint to POST a new question, 
@@ -75,6 +73,33 @@ def create_app(test_config=None):
   the form will clear and the question will appear at the end of the last page
   of the questions list in the "List" tab.  
   '''
+  @app.route('/questions', methods=['POST'])
+  def create_question():
+    body = request.get_json()
+    validated_body = {}
+    required_fields = ['question', 'answer', 'category', 'difficulty']
+    for field in required_fields:
+      resp = body.get(field, None)
+      if resp == None:
+        abort(400)
+      validated_body[field] = resp
+    question_resp = paginated_questions(request)
+
+    try:
+      question = Question(
+        question=validated_body['question'],
+        answer=validated_body['answer'],
+        category=validated_body['category'],
+        difficulty=validated_body['difficulty'])
+      question.insert()
+      return jsonify({
+        'success': True,
+        'created': question.id,
+        'questions': question_resp['current_questions'],
+        'total_questions': question_resp['total_questions']
+      }), 201
+    except:
+      abort(422)
 
   '''
   @TODO: 
