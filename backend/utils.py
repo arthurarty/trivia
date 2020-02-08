@@ -15,20 +15,25 @@ def get_all_categories():
     return category_dict
 
 
-def paginated_questions(request):
+def return_questions(request):
     """
     Query db to get all questions and format
-    to return a list of dict itemas
+    to return a list of dict items
     """
     all_questions = Question.query.order_by(Question.id).all()
+    response = paginate_questions(all_questions, request)
+    return response
+
+
+def paginate_questions(selection, request):
     page = request.args.get('page', 1, type=int)
     start =  (page - 1) * QUESTIONS_PER_PAGE
     end = start + QUESTIONS_PER_PAGE
 
-    questions = [question.format() for question in all_questions]
+    questions = [question.format() for question in selection]
     current_questions = questions[start:end]
     response = {
         'current_questions': current_questions,
-        'total_questions': len(all_questions)
+        'total_questions': len(selection)
     }
     return response

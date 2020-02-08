@@ -5,7 +5,7 @@ from flask_cors import CORS
 import random
 
 from models import setup_db, Question, Category
-from utils import get_all_categories, paginated_questions
+from utils import get_all_categories, return_questions, paginate_questions
 
 
 def create_app(test_config=None):
@@ -34,7 +34,7 @@ def create_app(test_config=None):
   '''
   @app.route('/questions', methods=['GET'])
   def get_questions():
-    question_resp = paginated_questions(request)
+    question_resp = return_questions(request)
     return jsonify({
       'success': True,
       'questions': question_resp['current_questions'],
@@ -53,7 +53,7 @@ def create_app(test_config=None):
 
     try:
       question.delete()
-      question_resp = paginated_questions(request)
+      question_resp = return_questions(request)
 
       return jsonify({
         'success': True,
@@ -63,16 +63,7 @@ def create_app(test_config=None):
       })
     except:
       abort(422)
-  '''
-  @TODO: 
-  Create an endpoint to POST a new question, 
-  which will require the question and answer text, 
-  category, and difficulty score.
 
-  TEST: When you submit a question on the "Add" tab, 
-  the form will clear and the question will appear at the end of the last page
-  of the questions list in the "List" tab.  
-  '''
   @app.route('/questions', methods=['POST'])
   def create_question():
     body = request.get_json()
@@ -83,7 +74,7 @@ def create_app(test_config=None):
       if resp == None:
         abort(400)
       validated_body[field] = resp
-    question_resp = paginated_questions(request)
+    question_resp = return_questions(request)
 
     try:
       question = Question(
@@ -112,15 +103,19 @@ def create_app(test_config=None):
   Try using the word "title" to start. 
   '''
 
-  '''
-  @TODO: 
-  Create a GET endpoint to get questions based on category. 
 
-  TEST: In the "List" tab / main screen, clicking on one of the 
-  categories in the left column will cause only questions of that 
-  category to be shown. 
-  '''
-
+  @app.route('/categories/<int:category_id>/questions', methods=['GET'])
+  def get_questions_by_category(category_id):
+    questions = Question.query.filter_by(category=category_id).all()
+    if len(questions) == 0:
+      abort(404)
+    resp = paginate_questions(questions, request)
+    return jsonify({
+      'success': True,
+      'questions': resp['current_questions'],
+      'total_questions': resp['total_questions'],
+      'current_category': category_id,
+    })
 
   '''
   @TODO: 
