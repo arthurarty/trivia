@@ -1,4 +1,5 @@
 # Full Stack Trivia API Backend
+[![Build Status](https://travis-ci.com/arthurarty/trivia.svg?branch=dev)](https://travis-ci.com/arthurarty/trivia)
 
 ## Getting Started
 

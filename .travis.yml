@@ -1,0 +1,13 @@
+language: python
+
+services:
+  - postgresql
+
+before_script:
+- psql -c 'create database trivia;' -U postgres
+- psql -c 'create database trivia_test;' -U postgres
+- psql trivia_test < backend/trivia.psql
+- pip install -r backend/requirements.txt
+
+script:
+  - python backend/test_flaskr.py
