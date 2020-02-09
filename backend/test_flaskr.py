@@ -6,7 +6,8 @@ from flask_sqlalchemy import SQLAlchemy
 
 from flaskr import create_app
 from models import Category, Question, setup_db
-from sample_data import (incomplete_question, new_question, search_term,
+from sample_data import (all_categories, category_four, category_four_404,
+                         incomplete_question, new_question, search_term,
                          unprocessable_question)
 
 
@@ -70,8 +71,10 @@ class TriviaTestCase(unittest.TestCase):
     def test_create_new_question(self):
         res = self.client().post('/questions', json=new_question)
         data = json.loads(res.data)
+        questions = data['questions']
         self.assertEqual(res.status_code, 201)
         self.assertEqual(data['success'], True)
+        self.assertGreater(len(questions), 0)
 
     def test_create_incomplete_question(self):
         """
@@ -95,8 +98,10 @@ class TriviaTestCase(unittest.TestCase):
     def test_get_questions_by_category(self):
         res = self.client().get('/categories/1/questions')
         data = json.loads(res.data)
+        questions = data['questions']
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
+        self.assertGreater(len(questions), 0)
 
     def test_get_questions_by_category_doenst_exist(self):
         res = self.client().get('/categories/10000/questions')
@@ -107,8 +112,34 @@ class TriviaTestCase(unittest.TestCase):
     def test_search_questions(self):
         res = self.client().post('/questions', json=search_term)
         data = json.loads(res.data)
+        questions = data['questions']
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
+        self.assertGreater(len(questions), 0)
+
+    def test_play_quiz(self):
+        res = self.client().post('/quizzes', json=all_categories)
+        data = json.loads(res.data)
+        question = data['question']
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertNotIn(question['id'], all_categories['previous_questions'])
+
+    def test_play_quiz_category(self):
+        res = self.client().post('/quizzes', json=category_four)
+        data = json.loads(res.data)
+        question = data['question']
+        category = category_four['quiz_category']
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertEqual(question['category'], category['id'])
+        self.assertNotIn(question['id'], category_four['previous_questions'])
+
+    def test_quiz_404(self):
+        res = self.client().post('/quizzes', json=category_four_404)
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data['success'], False)
 
 # Make the tests conveniently executable
 if __name__ == "__main__":
