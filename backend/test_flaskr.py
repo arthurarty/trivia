@@ -1,11 +1,13 @@
+import json
 import os
 import unittest
-import json
+
 from flask_sqlalchemy import SQLAlchemy
 
 from flaskr import create_app
-from models import setup_db, Question, Category
-from sample_data import new_question, incomplete_question, unprocessable_question
+from models import Category, Question, setup_db
+from sample_data import (incomplete_question, new_question, search_term,
+                         unprocessable_question)
 
 
 class TriviaTestCase(unittest.TestCase):
@@ -101,6 +103,12 @@ class TriviaTestCase(unittest.TestCase):
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 404)
         self.assertEqual(data['success'], False)
+    
+    def test_search_questions(self):
+        res = self.client().post('/questions', json=search_term)
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
 
 # Make the tests conveniently executable
 if __name__ == "__main__":

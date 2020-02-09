@@ -17,3 +17,7 @@ unprocessable_question = {
 	"category": "string",
 	"difficulty": 2
 }
+
+search_term = {
+	"searchTerm": "Who",
+}
