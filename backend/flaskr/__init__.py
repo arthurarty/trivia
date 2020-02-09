@@ -27,11 +27,6 @@ def create_app(test_config=None):
       'categories': get_all_categories(),
     })
 
-  '''
-  @TODO: 
-  Create an endpoint to handle GET requests for questions, 
-  number of total questions, current category, categories. 
-  '''
   @app.route('/questions', methods=['GET'])
   def get_questions():
     question_resp = return_questions(request)
@@ -119,17 +114,24 @@ def create_app(test_config=None):
       'current_category': category_id,
     })
 
-  '''
-  @TODO: 
-  Create a POST endpoint to get questions to play the quiz. 
-  This endpoint should take category and previous question parameters 
-  and return a random questions within the given category, 
-  if provided, and that is not one of the previous questions. 
-
-  TEST: In the "Play" tab, after a user selects "All" or a category,
-  one question at a time is displayed, the user is allowed to answer
-  and shown whether they were correct or not. 
-  '''
+  @app.route('/quizzes', methods=['POST'])
+  def generate_question():
+    body = request.get_json()
+    previous_questions = body.get('previous_questions', [])
+    category = body.get('quiz_category')
+    questions = []
+    if category['id'] == 0:
+      questions = Question.query.filter(~Question.id.in_(previous_questions))
+    else:
+      questions = Question.query.filter_by(category=category['id']).filter(~Question.id.in_(previous_questions))
+    formated_questions = [question.format() for question in questions]
+    if len(formated_questions) == 0:
+      abort(404)
+    random_question = random.randint(0, len(formated_questions) -1)
+    return jsonify({
+      'success': True,
+      'question': formated_questions[random_question]
+    })
 
   @app.errorhandler(404)
   def not_found(error):
@@ -162,6 +164,15 @@ def create_app(test_config=None):
       "error": 405,
       "message": "Method not allowed."
     })
+  
+  @app.errorhandler(500)
+  def internal_server_error(error):
+    return jsonify({
+      "success": False,
+      "error": 500,
+      "message": "Internal server error."
+    })
+  
   return app
 
     
