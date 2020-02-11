@@ -30,12 +30,15 @@ This will install all of the required packages we selected within the `requireme
 - [SQLAlchemy](https://www.sqlalchemy.org/) is the Python SQL toolkit and ORM we'll use handle the lightweight sqlite database. You'll primarily work in app.py and can reference models.py. 
 
 - [Flask-CORS](https://flask-cors.readthedocs.io/en/latest/#) is the extension we'll use to handle cross origin requests from our frontend server. 
+- [DOT-ENV](https://pypi.org/project/python-dotenv/) extension handling reading .env variables.
 
 ## Database Setup
 With Postgres running, restore a database using the trivia.psql file provided. From the backend folder in terminal run:
 ```bash
 psql trivia < trivia.psql
 ```
+## Environment variables
+Create a .env file in following the example (.env_example). Ensure to put database url for the app to use and for testing.
 
 ## Running the server
 
