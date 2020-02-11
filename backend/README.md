@@ -258,6 +258,148 @@ Example of response.
   "total_questions": 2
 }
 ```
+
+### Delete /questions/<int:question_id>
+- Deletes a question with the id of question_id from the database. 
+
+Curl example.
+```
+curl -X DELETE http://127.0.0.1:5000/questions/30
+```
+Example of output.
+```
+{
+  "deleted": 30,
+  "questions": [
+    {
+      "answer": "Edward Scissorhands",
+      "category": 5,
+      "difficulty": 3,
+      "id": 6,
+      "question": "What was the title of the 1990 fantasy directed by Tim Burton about a young man with multi-bladed appendages?"
+    },
+    {
+      "answer": "Brazil",
+      "category": 6,
+      "difficulty": 3,
+      "id": 10,
+      "question": "Which is the only team to play in every soccer World Cup tournament?"
+    },
+    {
+      "answer": "Uruguay",
+      "category": 6,
+      "difficulty": 4,
+      "id": 11,
+      "question": "Which country won the first ever soccer World Cup in 1930?"
+    }
+  ],
+  "success": true,
+  "total_questions": 21
+}
+```
+
+### Get /categories/<int:category_id>/questions
+- Returns all questions in a given category.
+
+Curl example. 
+```
+curl -X GET http://127.0.0.1:5000/categories/2/questions
+```
+Example of expected output.
+```
+{
+  "current_category": 2,
+  "questions": [
+    {
+      "answer": "Escher",
+      "category": 2,
+      "difficulty": 1,
+      "id": 16,
+      "question": "Which Dutch graphic artist–initials M C was a creator of optical"
+    },
+    {
+      "answer": "Mona Lisa",
+      "category": 2,
+      "difficulty": 3,
+      "id": 17,
+      "question": "La Giaconda is better known as what?"
+    },
+    {
+      "answer": "One",
+      "category": 2,
+      "difficulty": 4,
+      "id": 18,
+      "question": "How many paintings did Van Gogh sell in his lifetime?"
+    },
+    {
+      "answer": "Jackson Pollock",
+      "category": 2,
+      "difficulty": 2,
+      "id": 19,
+      "question": "Which American artist was a pioneer of Abstract Expressionism"
+    },
+    {
+      "answer": "Micheal Scott",
+      "category": 2,
+      "difficulty": 1,
+      "id": 24,
+      "question": "Who was their first boss?"
+    },
+    {
+      "answer": "Jim Herbert",
+      "category": 2,
+      "difficulty": 2,
+      "id": 28,
+      "question": "Who is Jim married to?"
+    }
+  ],
+  "success": true,
+  "total_questions": 6
+}
+```
+
+### POST /quizzes 
+- Returns questions in a random order.
+- Required fields: quiz_category(dict), previous_questions(list of int)
+
+Example of data to send
+```
+{
+	"quiz_category": {"id": 1},
+	"previous_questions": [21, 22, 20, 26]
+}
+```
+Curl example
+```
+curl -X POST \
+  http://127.0.0.1:5000/quizzes \
+  -H 'Content-Type: application/json' \
+  -d '{
+	"quiz_category": {"id": 1},
+	"previous_questions": [21, 22, 20, 26]
+}'
+```
+Example of output
+```
+{
+  "question": {
+    "answer": "The office.",
+    "category": 1,
+    "difficulty": 1,
+    "id": 26,
+    "question": "Best comedy show?"
+  },
+  "success": true
+}
+```
+
+### Possible errors
+1. 400 - Bad request. Request missing a required field.
+2. 404 - Resource not found. Question or category not found.
+3. 405 - Method not allowed on given endpoint.
+4. 422 -  Request unprocessable. 
+5. 500 - Internal server error.
+
 ## Testing
 To run the tests, run
 ```
