@@ -7,6 +7,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 from models import Category, Question, setup_db
 from utils import get_all_categories, paginate_questions, return_questions
+from sqlalchemy.exc import DataError, DatabaseError
 
 
 def create_app(test_config=None):
@@ -58,18 +59,15 @@ def create_app(test_config=None):
         if question is None:
             abort(404)
 
-        try:
-            question.delete()
-            question_resp = return_questions(request)
+        question.delete()
+        question_resp = return_questions(request)
 
-            return jsonify({
-                'success': True,
-                'deleted': question_id,
-                'questions': question_resp['current_questions'],
-                'total_questions': question_resp['total_questions']
-            })
-        except:
-            abort(422)
+        return jsonify({
+            'success': True,
+            'deleted': question_id,
+            'questions': question_resp['current_questions'],
+            'total_questions': question_resp['total_questions']
+        })
 
     @app.route('/questions', methods=['POST'])
     def create_question():
@@ -101,7 +99,7 @@ def create_app(test_config=None):
                     'questions': question_resp['current_questions'],
                     'total_questions': question_resp['total_questions']
                 }), 201
-            except:
+            except DatabaseError:
                 abort(422)
         else:
             questions = Question.query.filter(

@@ -14,6 +14,7 @@ from sample_data import (all_categories, category_four, category_four_404,
 
 load_dotenv()
 
+
 class TriviaTestCase(unittest.TestCase):
     """This class represents the trivia test case"""
 
